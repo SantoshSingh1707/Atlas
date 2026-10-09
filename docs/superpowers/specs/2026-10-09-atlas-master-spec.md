@@ -1,10 +1,10 @@
-# Spec: AI Personal Assistant Platform — Master Spec
+# Spec: Atlas — AI Personal Assistant Platform Master Spec
 
 - **Date:** 2026-10-09
 - **Status:** Draft for review
 - **Owner:** Santosh Singh
 - **Supersedes:** `docs/superpowers/specs/2026-10-09-research-assistant-design.md`
-- **Related:** `docs/superpowers/plans/2026-10-09-assistant-platform-master-plan.md`
+- **Related:** `docs/superpowers/plans/2026-10-09-atlas-master-plan.md`
 
 ---
 
@@ -370,7 +370,7 @@ docker compose config            # validate compose
 ## 11. Project structure
 
 ```
-research-assistant/
+Atlas/
   backend/
     app/
       config/          # Settings

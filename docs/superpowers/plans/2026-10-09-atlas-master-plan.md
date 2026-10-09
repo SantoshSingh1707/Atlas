@@ -1,4 +1,4 @@
-# AI Personal Assistant Platform — Master Implementation Plan
+# Atlas — Master Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.11, FastAPI, CrewAI, LangChain (openai/mistral), pydantic v2 + pydantic-settings, SQLModel/SQLite, httpx, trafilatura, BeautifulSoup, pytest; Next.js 14 (App Router), TypeScript, Tailwind, react-markdown, Vitest + Testing Library.
 
-**Spec:** `docs/superpowers/specs/2026-10-09-assistant-platform-master-spec.md`
+**Spec:** `docs/superpowers/specs/2026-10-09-atlas-master-spec.md`
 
 ## Global Constraints
 
