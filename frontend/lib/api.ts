@@ -56,8 +56,11 @@ export function streamRun(
 
   for (const step of STEPS) {
     source.addEventListener(step, (event) => {
+      const data = (event as MessageEvent).data;
+      // Native transport errors also fire on the "error" listener; skip non-message events.
+      if (typeof data !== "string") return;
       try {
-        handlers.onEvent?.(JSON.parse((event as MessageEvent).data) as RunEvent);
+        handlers.onEvent?.(JSON.parse(data) as RunEvent);
       } catch (error) {
         handlers.onError?.(error);
       }
@@ -65,13 +68,20 @@ export function streamRun(
   }
 
   source.addEventListener("result", (event) => {
+    const data = (event as MessageEvent).data;
     try {
-      handlers.onResult?.(JSON.parse((event as MessageEvent).data) as CapabilityResult);
+      handlers.onResult?.(JSON.parse(data) as CapabilityResult);
     } catch (error) {
       handlers.onError?.(error);
+    } finally {
+      // Terminal: close so the browser does not auto-reconnect to a finished run.
+      source.close();
     }
   });
 
-  source.onerror = (error) => handlers.onError?.(error);
+  source.onerror = (error) => {
+    handlers.onError?.(error);
+    source.close();
+  };
   return source;
 }

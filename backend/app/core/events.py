@@ -15,7 +15,9 @@ class EventBus:
         self._queues: dict[str, queue.Queue[RunEvent]] = {}
 
     def _queue(self, run_id: str) -> queue.Queue[RunEvent]:
-        return self._queues.setdefault(run_id, queue.Queue(maxsize=1000))
+        # Unbounded: a slow/absent consumer must never block the producer, and a
+        # run's event count is bounded upstream by its token/time caps.
+        return self._queues.setdefault(run_id, queue.Queue())
 
     def publish(self, event: RunEvent) -> None:
         self._queue(event.run_id).put(event)

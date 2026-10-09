@@ -49,3 +49,13 @@ def test_unknown_capability_raises():
         assert False, "expected KeyError"
     except KeyError:
         pass
+
+
+def test_bus_does_not_deadlock_on_many_events():
+    bus = EventBus()
+    for i in range(1500):
+        bus.publish(RunEvent(run_id="r", step="write", status="progress", detail=str(i)))
+    bus.publish(RunEvent(run_id="r", step="done", status="finished"))
+    events = list(bus.stream("r"))
+    assert len(events) == 1501
+    assert events[-1].step == "done"

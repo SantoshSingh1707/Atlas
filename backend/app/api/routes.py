@@ -10,7 +10,10 @@ from pydantic import BaseModel, Field
 
 from app.config.settings import Settings
 from app.core.engine import RunEngine
+from app.schemas import RunEvent
 from app.store.repository import RunStore
+
+_TERMINAL_STATUSES = {"finished", "failed"}
 
 
 class RunRequest(BaseModel):
@@ -91,8 +94,22 @@ def build_router(
             raise HTTPException(status_code=404, detail="run not found")
 
         def generate() -> Iterator[str]:
-            for event in engine.bus.stream(run_id):
-                yield f"event: {event.step}\ndata: {event.model_dump_json()}\n\n"
+            bundle = store.get_run(run_id)
+            if bundle is not None and bundle.run.status in _TERMINAL_STATUSES:
+                # Completed run: replay persisted steps so reconnects (and late
+                # subscribers) terminate instead of blocking on an empty queue.
+                for step in bundle.steps:
+                    event = RunEvent(
+                        run_id=run_id,
+                        step=step.step,
+                        status=step.status,
+                        detail=step.detail,
+                    )
+                    yield f"event: {event.step}\ndata: {event.model_dump_json()}\n\n"
+                engine.bus.close(run_id)
+            else:
+                for event in engine.bus.stream(run_id):
+                    yield f"event: {event.step}\ndata: {event.model_dump_json()}\n\n"
             result = _result_for(store, run_id)
             if result is not None:
                 yield f"event: result\ndata: {json.dumps(result)}\n\n"

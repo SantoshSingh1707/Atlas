@@ -3,3 +3,7 @@ node_modules/
 out/
 .env*
 !.env.example
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

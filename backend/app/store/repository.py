@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from uuid import uuid4
 
+from sqlalchemy import text
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine, select
 
@@ -110,7 +111,9 @@ class RunStore:
         with Session(self._engine) as session:
             runs = session.exec(
                 select(Run)
-                .order_by(Run.created_at.desc(), Run.id.desc())
+                # rowid is monotonic per insert, so identical timestamps still
+                # order newest-first deterministically (uuid ids would not).
+                .order_by(Run.created_at.desc(), text("rowid DESC"))
                 .offset(offset)
                 .limit(limit)
             ).all()

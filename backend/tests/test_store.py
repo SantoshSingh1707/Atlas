@@ -1,4 +1,9 @@
+from datetime import UTC, datetime
+
+from sqlmodel import Session
+
 from app.schemas import CapabilityResult, Citation, RunEvent, RunStatus, SearchResult
+from app.store.models import Run
 from app.store.repository import RunStore
 
 
@@ -33,3 +38,18 @@ def test_fail_sets_error():
     rid = s.create_run("research", "q")
     s.fail(rid, "boom")
     assert s.get_run(rid).run.error == "boom"
+
+
+def test_list_runs_ties_break_by_insertion_order():
+    s = RunStore("sqlite://")
+    ts = datetime(2026, 1, 1, tzinfo=UTC)
+    with Session(s._engine) as session:
+        # Same created_at, and id order (zzz > aaa) is the reverse of insert order.
+        session.add(
+            Run(id="zzz", capability_id="research", question="first", created_at=ts, updated_at=ts)
+        )
+        session.add(
+            Run(id="aaa", capability_id="research", question="second", created_at=ts, updated_at=ts)
+        )
+        session.commit()
+    assert [r.id for r in s.list_runs()] == ["aaa", "zzz"]
