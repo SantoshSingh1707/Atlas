@@ -33,7 +33,7 @@ class RunEngine:
         if bundle is None:
             raise KeyError(run_id)
         capability_id = bundle.run.capability_id
-        params = self._params.get(run_id, {"question": bundle.run.question})
+        params = self._params.pop(run_id, {"question": bundle.run.question})
         capability = self.capabilities.create(capability_id)
 
         def emit(event: RunEvent) -> None:

@@ -5,7 +5,7 @@ export type RunStep = "plan" | "search" | "read" | "write" | "done" | "error";
 export interface RunEvent {
   run_id: string;
   step: RunStep;
-  status: string;
+  status: "started" | "progress" | "finished" | "failed";
   detail?: string | null;
   token?: string | null;
 }

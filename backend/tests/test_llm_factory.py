@@ -22,3 +22,19 @@ def test_openai_ok():
 def test_unknown_provider():
     with pytest.raises(ConfigError):
         get_llm(Settings(llm_provider="wat"))
+
+
+def test_mistral_requires_key():
+    with pytest.raises(ConfigError):
+        get_llm(Settings(llm_provider="mistral", mistral_api_key=None))
+
+
+def test_mistral_ok():
+    llm = get_llm(
+        Settings(
+            llm_provider="mistral",
+            mistral_api_key="mk-x",
+            mistral_model="mistral-large-latest",
+        )
+    )
+    assert llm.model == "mistral-large-latest"
